@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quirk Landscaping — A Full Set of Books</title>
+<meta name="description" content="A complete double-entry accounting system built in Excel for a landscaping business: chart of accounts, journal, ledger, trial balance, and financial statements.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F4EF;
+  --paper-2:#E7EBE2;
+  --ink:#16211C;
+  --ink-soft:#4A574F;
+  --rule:#C6CDC0;
+  --ledger:#2F5D47;
+  --credit:#96342A;
+  --band:#E9EEE3;
+
+  --display:'Spectral',Georgia,serif;
+    --body:'Times New Roman',Times,serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --gut:clamp(20px,5vw,64px);
+  --max:1080px;
+}
+
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:17px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gut);}
+
+/* ---- ledger typographic conventions ---- */
+.rule-single{border-bottom:1px solid var(--ink);}
+.rule-double{border-bottom:3px double var(--ink);}
+
+.eyebrow{
+  font-family:var(--mono);
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--ledger);
+  margin:0 0 22px;
+}
+
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.015em;margin:0;}
+h1{font-family:'Times New Roman',Times,serif;font-weight:700;font-size:clamp(34px,6.2vw,60px);line-height:1.06;}
+h2{font-size:clamp(24px,3.4vw,34px);line-height:1.15;}
+h3{font-size:19px;line-height:1.3;font-weight:600;}
+
+p{margin:0 0 18px;}
+.lede{font-size:clamp(17px,2vw,20px);line-height:1.6;color:var(--ink-soft);max-width:60ch;}
+.small{font-size:14.5px;color:var(--ink-soft);}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum";}
+
+/* ---- section scaffolding ---- */
+section{padding:clamp(56px,8vw,96px) 0;}
+.sec-head{margin-bottom:clamp(32px,5vw,48px);}
+.sec-head h2{max-width:24ch;}
+.sec-head p{margin-top:14px;}
+
+/* ---- hero ---- */
+.hero{padding-top:clamp(44px,7vw,84px);padding-bottom:clamp(44px,6vw,72px);}
+.hero h1{max-width:16ch;}
+.hero .lede{margin-top:26px;}
+
+.specimen{
+  margin-top:clamp(36px,5vw,52px);
+  background:#FBFCFA;
+  border:1px solid var(--rule);
+  padding:clamp(18px,3.4vw,30px);
+  overflow-x:auto;
+}
+.specimen-cap{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+
+/* ---- tables ---- */
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14.5px;
+}
+caption{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ledger);padding-bottom:12px;}
+th{
+  font-family:var(--mono);
+  font-size:10.5px;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  text-align:left;
+  padding:0 12px 8px 0;
+  border-bottom:1px solid var(--ink);
+  white-space:nowrap;
+}
+td{padding:7px 12px 7px 0;border-bottom:1px solid var(--rule);vertical-align:top;}
+th.r,td.r{text-align:right;padding-right:0;}
+td.r{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;}
+tbody tr:nth-child(even){background:var(--band);}
+td.acct{font-family:var(--mono);color:var(--ink-soft);white-space:nowrap;}
+td.cr{color:var(--credit);}
+tr.total td{border-bottom:3px double var(--ink);border-top:1px solid var(--ink);font-weight:600;background:transparent;}
+tr.subtotal td{border-bottom:1px solid var(--ink);font-weight:600;background:transparent;}
+tr.group td{font-weight:600;padding-top:16px;background:transparent;border-bottom:1px solid var(--rule);}
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+/* ---- stats ---- */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:var(--rule);
+  border-top:1px solid var(--ink);
+  border-bottom:3px double var(--ink);
+}
+.stat{background:var(--paper);padding:22px 18px 20px;}
+.stat dt{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin-bottom:8px;
+}
+.stat dd{
+  margin:0;
+  font-family:var(--mono);
+  font-size:clamp(19px,2.6vw,26px);
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;
+}
+
+/* ---- cycle ---- */
+.cycle{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);}
+.stage{background:var(--paper);padding:22px 18px 24px;}
+.stage .step{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.14em;
+  color:var(--ledger);
+  display:block;
+  margin-bottom:12px;
+}
+.stage h3{margin-bottom:8px;}
+.stage p{font-size:14px;line-height:1.55;color:var(--ink-soft);margin:0;}
+
+/* ---- statements grid ---- */
+.stmt{margin-top:clamp(34px,4.5vw,48px);}
+.stmt-note{margin-top:14px;font-size:14px;color:var(--ink-soft);max-width:62ch;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,56px);align-items:start;}
+
+/* ---- decisions ---- */
+.decisions{border-top:1px solid var(--ink);}
+.decision{
+  display:grid;
+  grid-template-columns:150px 1fr;
+  gap:clamp(16px,3vw,40px);
+  padding:26px 0;
+  border-bottom:1px solid var(--rule);
+}
+.decision .tag{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--ledger);
+  padding-top:4px;
+}
+.decision p{margin:0;max-width:62ch;}
+.decision h3{margin-bottom:6px;}
+
+/* ---- code ---- */
+pre{
+  font-family:var(--mono);
+  font-size:12.5px;
+  line-height:1.7;
+  background:#FBFCFA;
+  border:1px solid var(--rule);
+  border-left:3px solid var(--ledger);
+  padding:20px 22px;
+  overflow-x:auto;
+  margin:0;
+  color:var(--ink);
+}
+pre .cmt{color:var(--ink-soft);font-style:italic;}
+
+/* ---- footer / cta ---- */
+.close{border-top:3px double var(--ink);padding-top:clamp(40px,5vw,60px);padding-bottom:clamp(48px,6vw,80px);}
+.actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px;}
+.btn{
+  display:inline-block;
+  font-family:var(--mono);
+  font-size:12.5px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:13px 22px;
+  border:1px solid var(--ink);
+  color:var(--ink);
+  text-decoration:none;
+  background:transparent;
+  transition:background .18s ease,color .18s ease;
+}
+.btn:hover,.btn:focus-visible{background:var(--ink);color:var(--paper);}
+.btn-primary{background:var(--ledger);border-color:var(--ledger);color:#fff;}
+.btn-primary:hover,.btn-primary:focus-visible{background:var(--ink);border-color:var(--ink);color:#fff;}
+a{color:var(--ledger);text-underline-offset:3px;}
+:focus-visible{outline:2px solid var(--ledger);outline-offset:3px;}
+
+/* ---- reveal ---- */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.in{opacity:1;transform:none;}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none;}
+  *{scroll-behavior:auto!important;}
+}
+
+/* ---- responsive ---- */
+@media (max-width:860px){
+  .cycle{grid-template-columns:1fr 1fr;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .two-col{grid-template-columns:1fr;}
+}
+@media (max-width:560px){
+  body{font-size:16px;}
+  .cycle{grid-template-columns:1fr;}
+  .decision{grid-template-columns:1fr;gap:6px;}
+  .decision .tag{padding-top:0;}
+  table{font-size:13.5px;}
+}
+</style>
+</head>
+<body>
+<img src="IMG_6672.JPEG" alt="Client property: rose bed and stone walk" style="float:right;width:clamp(180px,26vw,340px);height:auto;margin:144px 96px 24px 40px;border:1px solid var(--rule);">
+<!-- ============ HERO ============ -->
+<header class="hero wrap">
+  <p class="eyebrow">Quirk Landscaping &nbsp;·&nbsp; Books for the period beginning 05 · 16 · 2026</p>
+  <h1>I built the whole cycle, from blank sheet to balance sheet.</h1>
+  <p class="lede">A landscaping business had a shoebox of Venmo screenshots and no books. I built it a complete double-entry accounting system in Excel, 23 accounts, a journal, a ledger, a trial balance, and statements that tie. No accounting software. Just the rules.</p>
+
+  <div class="specimen reveal">
+    <div class="specimen-cap">
+      <span>General Journal &nbsp;·&nbsp; Entry #5</span>
+      <span>Leaf removal — Jayclon — 05 · 18 · 2026</span>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:88px">Acct</th>
+            <th>Account</th>
+            <th class="r">Debit</th>
+            <th class="r">Credit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="acct">1000</td><td>Cash — Checking / Venmo</td><td class="r">825.00</td><td class="r"></td></tr>
+          <tr><td class="acct">4010</td><td>Revenue — Landscaping</td><td class="r"></td><td class="r cr">825.00</td></tr>
+          <tr><td class="acct">5010</td><td>Wages Expense</td><td class="r">360.00</td><td class="r"></td></tr>
+          <tr><td class="acct">1000</td><td>Cash — Checking / Venmo</td><td class="r"></td><td class="r cr">360.00</td></tr>
+          <tr><td class="acct">6020</td><td>Supplies Expense</td><td class="r">27.09</td><td class="r"></td></tr>
+          <tr><td class="acct">1120</td><td>Inventory — Leaf Bags</td><td class="r"></td><td class="r cr">27.09</td></tr>
+          <tr class="total"><td class="acct"></td><td>Entry total</td><td class="r">1,212.09</td><td class="r">1,212.09</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small" style="margin:16px 0 0">One job, six lines. Revenue recognized, labor expensed against it, and leaf bags moved out of inventory into supplies expense — because the bags were bought in a prior entry and only consumed here. Debits equal credits, which is the only thing the system will accept.</p>
+  </div>
+</header>
+
+<!-- ============ STATS ============ -->
+<div class="wrap">
+  <dl class="stats reveal">
+    <div class="stat"><dt>Service revenue</dt><dd>$3,225.00</dd></div>
+    <div class="stat"><dt>Net income</dt><dd>$2,162.91</dd></div>
+    <div class="stat"><dt>Total assets</dt><dd>$13,162.91</dd></div>
+    <div class="stat"><dt>Trial balance variance</dt><dd>$0.00</dd></div>
+  </dl>
+</div>
+
+<!-- ============ CYCLE ============ -->
+<section class="wrap">
+  <div class="sec-head reveal">
+    <p class="eyebrow">How the book works</p>
+    <h2>Five stages, and each one feeds the next automatically.</h2>
+    <p class="lede">Nothing is retyped between stages. A number entered once on the job form appears in the ledger, the trial balance, and both statements without anyone touching it again — which is what keeps the statements honest.</p>
+  </div>
+
+  <div class="cycle reveal">
+    <div class="stage">
+      <span class="step">01</span>
+      <h3>Job entry form</h3>
+      <p>Date, client, service, hours, revenue, wages, materials. Validated before anything is written.</p>
+    </div>
+    <div class="stage">
+      <span class="step">02</span>
+      <h3>General journal</h3>
+      <p>14 entries, 43 lines. Every line carries its account number and type, pulled by lookup from the chart of accounts.</p>
+    </div>
+    <div class="stage">
+      <span class="step">03</span>
+      <h3>Ledger</h3>
+      <p>A pivot that posts the journal by date, entry, and account, so any balance can be traced back to the job that created it.</p>
+    </div>
+    <div class="stage">
+      <span class="step">04</span>
+      <h3>Trial balance</h3>
+      <p>All 23 accounts, debits against credits. If the two columns disagree, the statements below are wrong and it shows here first.</p>
+    </div>
+    <div class="stage">
+      <span class="step">05</span>
+      <h3>Statements</h3>
+      <p>Income statement and balance sheet, both reading directly off the trial balance. No hardcoded figures anywhere.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATEMENTS ============ -->
+<section class="wrap">
+  <div class="sec-head reveal">
+    <p class="eyebrow">The output</p>
+    <h2>The statements, exactly as the workbook produces them.</h2>
+  </div>
+
+  <!-- trial balance -->
+  <div class="stmt reveal">
+    <div class="tbl-scroll">
+      <table>
+        <caption>Trial Balance — all accounts</caption>
+        <thead>
+          <tr><th style="width:80px">Acct</th><th>Account</th><th>Type</th><th class="r">Debit</th><th class="r">Credit</th><th class="r">Balance</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="acct">1000</td><td>Cash — Checking / Venmo</td><td class="small">Current Assets</td><td class="r">13,225.00</td><td class="r">1,165.44</td><td class="r">12,059.56</td></tr>
+          <tr><td class="acct">1010</td><td>Cash — Paper</td><td class="small">Current Assets</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">1100</td><td>Accounts Receivable</td><td class="small">Current Assets</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">1110</td><td>Inventory — Fuel</td><td class="small">Current Assets</td><td class="r">19.98</td><td class="r">—</td><td class="r">19.98</td></tr>
+          <tr><td class="acct">1120</td><td>Inventory — Leaf Bags</td><td class="small">Current Assets</td><td class="r">63.37</td><td class="r">27.09</td><td class="r">36.28</td></tr>
+          <tr><td class="acct">1130</td><td>Inventory — Other Supplies</td><td class="small">Current Assets</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">1500</td><td>Equipment — Machinery</td><td class="small">Fixed Assets</td><td class="r">700.00</td><td class="r">—</td><td class="r">700.00</td></tr>
+          <tr><td class="acct">1510</td><td>Equipment — Hand Tools</td><td class="small">Fixed Assets</td><td class="r">347.09</td><td class="r">—</td><td class="r">347.09</td></tr>
+          <tr><td class="acct">1600</td><td>Accumulated Depreciation</td><td class="small">Contra Assets</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">2020</td><td>Wages Payable</td><td class="small">Current Liabilities</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">3010</td><td>Owner's Capital</td><td class="small">Owner's Equity</td><td class="r">—</td><td class="r cr">1,000.00</td><td class="r">(1,000.00)</td></tr>
+          <tr><td class="acct">3030</td><td>Retained Earnings</td><td class="small">Owner's Equity</td><td class="r">—</td><td class="r cr">10,000.00</td><td class="r">(10,000.00)</td></tr>
+          <tr><td class="acct">4010</td><td>Revenue — Landscaping</td><td class="small">Service Revenue</td><td class="r">—</td><td class="r cr">3,225.00</td><td class="r">(3,225.00)</td></tr>
+          <tr><td class="acct">4020</td><td>Revenue — Hauling / Moving</td><td class="small">Service Revenue</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">4510</td><td>Other Revenue</td><td class="small">Revenue</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">5010</td><td>Wages Expense</td><td class="small">COGS</td><td class="r">1,035.00</td><td class="r">—</td><td class="r">1,035.00</td></tr>
+          <tr><td class="acct">5030</td><td>Materials Expense</td><td class="small">COGS</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">5050</td><td>Dump / Disposal Fees</td><td class="small">COGS</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">5060</td><td>Equipment Rental</td><td class="small">COGS</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">6010</td><td>Fuel Expense</td><td class="small">Operating Expenses</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">6020</td><td>Supplies Expense</td><td class="small">Operating Expenses</td><td class="r">27.09</td><td class="r">—</td><td class="r">27.09</td></tr>
+          <tr><td class="acct">6030</td><td>Depreciation Expense</td><td class="small">Operating Expenses</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr><td class="acct">6900</td><td>Other Expense</td><td class="small">Operating Expenses</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+          <tr class="total"><td class="acct"></td><td>Totals</td><td></td><td class="r">15,417.53</td><td class="r">15,417.53</td><td class="r">0.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="stmt-note">Empty accounts are left in deliberately. The chart of accounts was built for the business the operation is becoming — receivables, depreciation, disposal fees — not only for the transactions that happened in week one.</p>
+  </div>
+
+  <!-- income statement + balance sheet -->
+  <div class="stmt two-col reveal">
+    <div>
+      <div class="tbl-scroll">
+        <table>
+          <caption>Income Statement</caption>
+          <thead><tr><th>Account</th><th class="r">Amount</th><th class="r">Total</th></tr></thead>
+          <tbody>
+            <tr class="group"><td colspan="3">Service Revenue</td></tr>
+            <tr><td>Revenue — Landscaping</td><td class="r">3,225.00</td><td class="r"></td></tr>
+            <tr><td>Revenue — Hauling / Moving</td><td class="r">—</td><td class="r"></td></tr>
+            <tr><td>Other Revenue</td><td class="r">—</td><td class="r"></td></tr>
+            <tr class="subtotal"><td>Total Revenue</td><td class="r"></td><td class="r">3,225.00</td></tr>
+
+            <tr class="group"><td colspan="3">Cost of Services</td></tr>
+            <tr><td>Wages Expense</td><td class="r">1,035.00</td><td class="r"></td></tr>
+            <tr><td>Materials Expense</td><td class="r">—</td><td class="r"></td></tr>
+            <tr><td>Dump / Disposal Fees</td><td class="r">—</td><td class="r"></td></tr>
+            <tr><td>Equipment Rental</td><td class="r">—</td><td class="r"></td></tr>
+            <tr class="subtotal"><td>Total Cost of Services</td><td class="r"></td><td class="r">1,035.00</td></tr>
+            <tr class="subtotal"><td>Gross Profit</td><td class="r"></td><td class="r">2,190.00</td></tr>
+
+            <tr class="group"><td colspan="3">Operating Expenses</td></tr>
+            <tr><td>Fuel Expense</td><td class="r">—</td><td class="r"></td></tr>
+            <tr><td>Supplies Expense</td><td class="r">27.09</td><td class="r"></td></tr>
+            <tr><td>Depreciation Expense</td><td class="r">—</td><td class="r"></td></tr>
+            <tr><td>Other Expense</td><td class="r">—</td><td class="r"></td></tr>
+            <tr class="subtotal"><td>Total Operating Expenses</td><td class="r"></td><td class="r">27.09</td></tr>
+
+            <tr class="total"><td>Net Income</td><td class="r"></td><td class="r">2,162.91</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="stmt-note">Gross margin of 67.9% on the jobs booked so far. Wages are the only real cost of service, which is what you would expect from a labor business with owned equipment.</p>
+    </div>
+
+    <div>
+      <div class="tbl-scroll">
+        <table>
+          <caption>Balance Sheet</caption>
+          <thead><tr><th>Account</th><th class="r">Amount</th><th class="r">Total</th></tr></thead>
+          <tbody>
+            <tr class="group"><td colspan="3">Current Assets</td></tr>
+            <tr><td>Cash — Checking / Venmo</td><td class="r">12,059.56</td><td class="r"></td></tr>
+            <tr><td>Cash — Paper</td><td class="r">—</td><td class="r"></td></tr>
+            <tr><td>Accounts Receivable</td><td class="r">—</td><td class="r"></td></tr>
+            <tr><td>Inventory — Fuel</td><td class="r">19.98</td><td class="r"></td></tr>
+            <tr><td>Inventory — Leaf Bags</td><td class="r">36.28</td><td class="r"></td></tr>
+            <tr><td>Inventory — Other Supplies</td><td class="r">—</td><td class="r"></td></tr>
+            <tr class="subtotal"><td>Total Current Assets</td><td class="r"></td><td class="r">12,115.82</td></tr>
+
+            <tr class="group"><td colspan="3">Equipment</td></tr>
+            <tr><td>Equipment — Machinery</td><td class="r">700.00</td><td class="r"></td></tr>
+            <tr><td>Equipment — Hand Tools</td><td class="r">347.09</td><td class="r"></td></tr>
+            <tr><td>Less: Accumulated Depreciation</td><td class="r">—</td><td class="r"></td></tr>
+            <tr class="subtotal"><td>Net Equipment</td><td class="r"></td><td class="r">1,047.09</td></tr>
+            <tr class="total"><td>Total Assets</td><td class="r"></td><td class="r">13,162.91</td></tr>
+
+            <tr class="group"><td colspan="3">Liabilities</td></tr>
+            <tr><td>Wages Payable</td><td class="r">—</td><td class="r"></td></tr>
+            <tr class="subtotal"><td>Total Liabilities</td><td class="r"></td><td class="r">0.00</td></tr>
+
+            <tr class="group"><td colspan="3">Owner's Equity</td></tr>
+            <tr><td>Owner's Capital</td><td class="r">1,000.00</td><td class="r"></td></tr>
+            <tr><td>Retained Earnings</td><td class="r">10,000.00</td><td class="r"></td></tr>
+            <tr><td>Net Income</td><td class="r">2,162.91</td><td class="r"></td></tr>
+            <tr class="total"><td>Total Liabilities &amp; Equity</td><td class="r"></td><td class="r">13,162.91</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="stmt-note">Assets equal liabilities plus equity to the cent, and the tie is a formula, not a plug. Change any journal line and both sides move together.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DECISIONS ============ -->
+<section class="wrap">
+  <div class="sec-head reveal">
+    <p class="eyebrow">What I learned Most</p>
+    <h2> This project really put things in perspective for me as both the accountant and a manager</h2>
+    <p class="lede"> This project definitely challenged my knowledge of accounting, but I learned alot. When it came time to make decisions on how to organize the books I had to think about what I am representing with these numbers.</p>
+  </div>
+
+  <div class="decisions reveal">
+    <div class="decision">
+      <span class="tag">Classification</span>
+      <div>
+        <h3>Wages sit in cost of services, not operating expense</h3>
+        <p>Crew labor is directly traceable to a job, so it belongs above the gross profit line. Putting it below would have made gross margin meaningless for a business whose only real input is hours. Supplies stay in operating expense because leaf bags aren't tied to a specific job at purchase.</p>
+      </div>
+    </div>
+    <div class="decision">
+      <span class="tag">Inventory</span>
+      <div>
+        <h3>Supplies are capitalized on purchase, expensed on use</h3>
+        <p>Leaf bags and fuel are bought in bulk and consumed across several jobs. Buying them debits an inventory account; using them on a job moves the amount to supplies expense. Expensing at purchase would have been simpler and would have distorted every period the business bought ahead.</p>
+      </div>
+    </div>
+    <div class="decision">
+      <span class="tag">Traceability</span>
+      <div>
+        <h3>Every balance walks back to a job</h3>
+        <p>Client and service ride along on the journal lines, so the ledger can be expanded from an account balance down to the entry and the customer that produced it. That is the question an auditor asks first, and answering it shouldn't require a separate schedule.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MACRO ============ -->
+<section class="wrap">
+  <div class="sec-head reveal">
+    <p class="eyebrow">Under the hood</p>
+    <h2>What the entry macro refuses to do.</h2>
+    <p class="lede">Written in VBA. It validates the form, finds the next entry ID from the journal table itself, then writes debits and credits in matched pairs — so an unbalanced entry is not something the user can create by mistake.</p>
+  </div>
+
+  <pre class="reveal"><span class="cmt">' --- validate before anything is written ---</span>
+If clientName = "" Or serviceName = "" Then
+    MsgBox "Please choose a client and a service."
+    Exit Sub
+End If
+If revenueAmt &lt;= 0 Then
+    MsgBox "Please enter a revenue amount greater than 0."
+    Exit Sub
+End If
+If materialsAmt &gt; 0 And materialsAcct = "" Then
+    MsgBox "You entered a materials cost - choose which account it came from."
+    Exit Sub
+End If
+
+<span class="cmt">' --- next entry ID comes from the journal, not a counter ---</span>
+nextID = Application.WorksheetFunction.Max(colEntryID.DataBodyRange) + 1
+
+<span class="cmt">' --- debits and credits are always written as a pair ---</span>
+AddEntryLine loGE, nextID, entryDate, ..., "Cash -Checking / Venmo", revenueAmt, 0
+AddEntryLine loGE, nextID, entryDate, ..., "Revenue - Landscaping",  0, revenueAmt
+
+If wagesAmt &gt; 0 Then
+    AddEntryLine loGE, nextID, entryDate, ..., "Wages Expense",         wagesAmt, 0
+    AddEntryLine loGE, nextID, entryDate, ..., "Cash -Checking / Venmo", 0, wagesAmt
+End If
+
+If materialsAmt &gt; 0 Then
+    AddEntryLine loGE, nextID, entryDate, ..., "Supplies Expense", materialsAmt, 0
+    AddEntryLine loGE, nextID, entryDate, ..., materialsAcct,      0, materialsAmt
+End If
+
+ThisWorkbook.RefreshAll   <span class="cmt">' ledger, trial balance, statements</span></pre>
+  <p class="stmt-note">Each written line also rebuilds the account-number and account-type lookups against the chart of accounts, so a renamed or renumbered account propagates through the journal instead of silently breaking the trial balance.</p>
+</section>
+
+<!-- ============ CLOSE ============ -->
+<footer class="wrap close reveal">
+  <p class="eyebrow">The file itself</p>
+  <h2 style="max-width:20ch">Open the workbook and check the math.</h2>
+  <p class="lede" style="margin-top:16px">Every formula, the pivot definitions, and the full VBA module are in the file. Nothing on this page is typed in by hand — it all comes off the trial balance.</p>
+
+  <div class="actions">
+    <a class="btn btn-primary" href="https://1drv.ms/x/c/E87B2E67B087C0A2/IQCyoZZLFE0tQJPJ8UtOIyQJATkXIOzmPC4fEudQLQ8DV48?e=0OJwGA" download>Download the workbook (.xlsm)</a>
+    <a class="btn" href="https://github.com/YOUR-USERNAME/landscaping-books"\
+    <a class="btn" href="mailto:YOUR-EMAIL@EXAMPLE.COM"
+  </div>
+
+  <p class="small" style="margin-top:40px;padding-top:24px;border-top:1px solid var(--rule)">
+    Built by <strong>Avery Hamilton</strong> · Rutgers - New Brunswick, Accounting and Accounting Information Systems· 2028<br>
+    Client names and figures are from the real business, used with permission.
+  </p>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    els.forEach(function(el){ el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.08, rootMargin:'0px 0px -40px 0px'});
+  els.forEach(function(el){ io.observe(el); });
+})();
+</script>
+
+</body>
+</html>
+
